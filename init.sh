@@ -42,7 +42,8 @@ else
 fi
 
 # Get GitHub username
-read -p "Enter your GitHub username (for chezmoi repo): " GITHUB_USERNAME
+echo -n "Enter your GitHub username (for chezmoi repo): "
+read GITHUB_USERNAME
 
 # Initialize and apply chezmoi
 echo -e "${YELLOW}Initializing chezmoi with your dotfiles...${NC}"
