@@ -1,0 +1,3 @@
+[keepassxc]
+    database = "~/KeePassXC/Passwords.kdbx"
+    prompt = true

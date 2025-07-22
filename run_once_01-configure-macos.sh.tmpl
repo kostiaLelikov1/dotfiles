@@ -1,0 +1,214 @@
+#!/bin/bash
+
+set -eufo pipefail
+
+echo "Configuring macOS system preferences..."
+
+# Close any open System Preferences panes, to prevent them from overriding
+# settings we're about to change
+osascript -e 'tell application "System Preferences" to quit'
+
+# ==============================================
+# Keyboard Settings
+# ==============================================
+
+echo "Configuring keyboard settings..."
+
+# Disable press-and-hold for keys in favor of key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Set the fastest keyboard repeat rate
+defaults write NSGlobalDomain KeyRepeat -int 1
+
+# Set the shortest delay until key repeat
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+# ==============================================
+# Language & Input Sources
+# ==============================================
+
+echo "Configuring language switching shortcuts..."
+
+# Enable keyboard shortcuts for input sources
+# Note: These are stored in com.apple.symbolichotkeys
+# 60 = Select previous input source
+# 61 = Select next input source
+
+# First, ensure the input menu is shown in menu bar
+defaults write com.apple.TextInputMenu visible -bool true
+
+# Disable Spotlight keyboard shortcuts to free them up
+# 64 = Show Spotlight search (Cmd+Space)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "
+<dict>
+    <key>enabled</key>
+    <false/>
+</dict>"
+
+# 65 = Show Finder search window (Cmd+Alt+Space)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 "
+<dict>
+    <key>enabled</key>
+    <false/>
+</dict>"
+
+# Configure input source switching shortcuts
+# Select previous input source: Cmd+Space
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 "
+<dict>
+    <key>enabled</key>
+    <true/>
+    <key>value</key>
+    <dict>
+        <key>type</key>
+        <string>standard</string>
+        <key>parameters</key>
+        <array>
+            <integer>32</integer>
+            <integer>49</integer>
+            <integer>1048576</integer>
+        </array>
+    </dict>
+</dict>"
+
+# Select next input source: Cmd+Shift+Space  
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 61 "
+<dict>
+    <key>enabled</key>
+    <true/>
+    <key>value</key>
+    <dict>
+        <key>type</key>
+        <string>standard</string>
+        <key>parameters</key>
+        <array>
+            <integer>32</integer>
+            <integer>49</integer>
+            <integer>1179648</integer>
+        </array>
+    </dict>
+</dict>"
+
+# ==============================================
+# Dock
+# ==============================================
+
+echo "Configuring Dock settings..."
+
+# Position the Dock on the left side of the screen
+defaults write com.apple.dock orientation -string "left"
+
+# Keep the Dock visible (no auto-hide)
+defaults write com.apple.dock autohide -bool false
+
+# Don't show recent applications in Dock
+defaults write com.apple.dock show-recents -bool false
+
+# Make Dock icons of hidden applications translucent
+defaults write com.apple.dock showhidden -bool true
+
+# Set the icon size of Dock items to 48 pixels
+defaults write com.apple.dock tilesize -int 48
+
+# Disable magnification
+defaults write com.apple.dock magnification -bool false
+
+# Minimize windows using scale effect
+defaults write com.apple.dock mineffect -string "scale"
+
+# Speed up Mission Control animations
+defaults write com.apple.dock expose-animation-duration -float 0.1
+
+# Aerospace effect for Mission Control
+defaults write com.apple.dock expose-group-apps -bool true
+
+# ==============================================
+# Screenshots
+# ==============================================
+
+echo "Configuring screenshot settings..."
+
+# Create Screenshots folder on Desktop if it doesn't exist
+mkdir -p "${HOME}/Desktop/Screenshots"
+
+# Save screenshots to the Screenshots folder on Desktop
+defaults write com.apple.screencapture location -string "${HOME}/Desktop/Screenshots"
+
+# Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
+defaults write com.apple.screencapture type -string "png"
+
+# Disable shadow in screenshots
+defaults write com.apple.screencapture disable-shadow -bool true
+
+# Enable screenshot thumbnail preview
+defaults write com.apple.screencapture show-thumbnail -bool true
+
+# ==============================================
+# Finder
+# ==============================================
+
+echo "Configuring Finder settings..."
+
+# Show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+# Show hidden files by default
+defaults write com.apple.finder AppleShowAllFiles -bool true
+
+# Show path bar
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+# When performing a search, search the current folder by default
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# Disable the warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Use list view in all Finder windows by default
+# Four-letter codes for the other view modes: `icnv`, `clmv`, `glyv`
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+# Show the ~/Library folder
+chflags nohidden ~/Library
+
+# Show the /Volumes folder
+sudo chflags nohidden /Volumes
+
+# ==============================================
+# Other Configurations
+# ==============================================
+
+defaults write -g NSWindowShouldDragOnGesture -bool true
+
+# ==============================================
+# Menu Bar
+# ==============================================
+
+echo "Configuring menu bar..."
+
+# Show battery percentage in menu bar
+defaults write com.apple.menuextra.battery ShowPercent -bool true
+
+# ==============================================
+# Apply Changes
+# ==============================================
+
+echo "Applying changes..."
+
+# Kill affected applications
+for app in "Dock" "Finder" "SystemUIServer"; do
+    killall "${app}" > /dev/null 2>&1 || true
+done
+
+echo "macOS configuration complete!"
+echo ""
+echo "Note: Some changes require a logout/restart to take effect."
+echo "Also, you may need to:"
+echo "1. Go to System Preferences > Keyboard > Shortcuts > Input Sources"
+echo "   to verify the language switching shortcuts"
+echo "2. Ensure you have multiple input sources added in:"
+echo "   System Preferences > Keyboard > Input Sources"
+echo "3. Raycast should now be able to use Cmd+Space without conflicts"

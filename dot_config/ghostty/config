@@ -1,0 +1,9 @@
+theme = catppuccin-macchiato.conf
+
+
+macos-option-as-alt = true
+keybind = shift+enter=text:\n
+
+
+font-family="JetBrainsMonoNL Nerd Font Mono Regular"
+font-feature=-calt

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+set -eufo pipefail
+
+echo "Setting up your development environment..."
+
+# Install Homebrew if not installed
+if ! command -v brew &> /dev/null; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add Homebrew to PATH for Apple Silicon Macs
+    if [[ -d "/opt/homebrew/bin" ]]; then
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+fi
+
+# Install packages from Brewfile
+echo "Installing packages from Brewfile..."
+brew bundle --file={{ .chezmoi.sourceDir }}/Brewfile
+
+# Install oh-my-zsh if not installed
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    echo "Installing oh-my-zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
+fi
+
+# Install custom oh-my-zsh plugins
+echo "Installing oh-my-zsh plugins..."
+
+# zsh-autosuggestions
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+fi
+
+# zsh-syntax-highlighting
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+fi
+
+# fast-syntax-highlighting
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/fast-syntax-highlighting" ]; then
+    git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
+fi
+
+# zsh-autocomplete
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autocomplete" ]; then
+    git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
+fi
+
+# Install fzf-git.sh
+if [ ! -d "$HOME/fzf-git.sh" ]; then
+    echo "Installing fzf-git.sh..."
+    git clone https://github.com/junegunn/fzf-git.sh.git ~/fzf-git.sh
+fi
+
+# Setup Anaconda (if needed)
+if [ ! -d "$HOME/anaconda3" ]; then
+    echo "Note: Anaconda not found. You may want to install it manually if needed."
+fi
+
+# Setup bat theme
+echo "Setting up bat theme..."
+if command -v bat &> /dev/null; then
+    # Download Catppuccin theme for bat if not exists
+    BAT_CONFIG_DIR="$(bat --config-dir)"
+    if [ ! -f "$BAT_CONFIG_DIR/themes/Catppuccin Macchiato.tmTheme" ]; then
+        mkdir -p "$BAT_CONFIG_DIR/themes"
+        curl -fsSL https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Macchiato.tmTheme -o "$BAT_CONFIG_DIR/themes/Catppuccin Macchiato.tmTheme"
+        bat cache --build
+    fi
+fi
+
+# Note: Tmux plugins will be installed by the separate run_once_install-tmux-plugins.sh.tmpl script
+
+echo "Setup complete!"

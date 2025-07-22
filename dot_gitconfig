@@ -1,0 +1,27 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Kostiantyn
+  email = kostiantyn.lelikov@eze.tech
+
+[include]
+  path = ~/.config/delta/catppuccin.gitconfig
+
+[core]
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+  navigate = true    # use n and N to move between diff sections
+  side-by-side = true    # show diff line by line
+  features = catppuccin-macchiato
+    # delta detects terminal colors automatically; set one of these to disable auto-detection
+    # dark = true
+    # light = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default

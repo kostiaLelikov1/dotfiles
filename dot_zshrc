@@ -1,0 +1,130 @@
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="apple"
+
+zstyle ':omz:plugins:nvm' lazy yes
+
+plugins=(
+	git
+	aws
+	brew
+	node
+	nvm
+	npm
+	macos
+	python
+	tmux
+	yarn
+	zsh-autosuggestions
+	zsh-syntax-highlighting
+	fast-syntax-highlighting
+	zsh-autocomplete
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# ----- NVM (Lazy loaded) -----
+nvm() {
+    unset -f nvm
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+    nvm "$@"
+}
+
+# ----- CONDA (Lazy loaded) -----
+conda() {
+    unset -f conda
+    __conda_setup="$('/Users/kostiantyn/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/Users/kostiantyn/anaconda3/etc/profile.d/conda.sh" ]; then
+            . "/Users/kostiantyn/anaconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="/Users/kostiantyn/anaconda3/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+    conda "$@"
+}
+
+# ----- HOMEBREW -----
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# ----- ZOXIDE -----
+eval "$(zoxide init zsh)"
+
+alias cd='z'
+
+# ----- BAT -----
+export BAT_THEME="Catppuccin Macchiato"
+
+# ----- FZF -----
+# Combine FZF initialization
+if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
+  export PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
+fi
+
+# Auto-completion and key bindings
+[[ $- == *i* ]] && source "/opt/homebrew/opt/fzf/shell/completion.zsh" 2> /dev/null
+source "/opt/homebrew/opt/fzf/shell/key-bindings.zsh"
+
+export FZF_DEFAULT_OPTS=" \
+--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 \
+--color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 \
+--color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796"
+
+# ----- use fd instead of the default find command -----
+export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
+
+_fzf_compgen_path() {
+  fd --hidden --exclude .git . "$1"
+}
+
+_fzf_compgen_dir() {
+  fd --type d --hidden --exclude .git . "$1"
+}
+
+# ----- fzf preview settings -----
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=header,grid --line-range :500 {}'"
+export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
+
+_fzf_comprun() {
+  local command=$1
+  shift
+  
+  case $command in
+    cd) fzf --preview 'eza --tree --color=always {} | head -200'  "$@" ;;
+    export|unset) fzf --preview "eval 'echo \$' {}" "$@" ;;
+    ssh) fzf --preview 'dig {}' "$@" ;;
+    *) fzf --preview "bat -n --color=always --line-range :500 {}" "$@";;  # Fixed syntax error
+  esac
+}
+
+# ----- fzf-git -----
+source ~/fzf-git.sh/fzf-git.sh
+
+# ----- THEFUCK (Lazy loaded) -----
+thefuck() {
+    unset -f thefuck
+    eval $(command thefuck --alias)
+    eval $(command thefuck --alias fk)
+    thefuck "$@"
+}
+alias fk='thefuck'
+
+# ----- EZA -----
+alias lse="eza --color=always --long --git --no-user --no-permissions --icons=always"
+
+# ---- ATUIN -----
+eval "$(atuin init zsh)"
+
+# ----- CUSTOM -----
+export EDITOR='nvim'
+alias vim=nvim
+alias run-swag="tmuxinator start swag"
+alias type-practice="smassh"
+alias help="tldr"

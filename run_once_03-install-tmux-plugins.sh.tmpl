@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -eufo pipefail
+
+echo "Setting up tmux plugin manager and plugins..."
+
+# Install Tmux Plugin Manager (TPM)
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    echo "Installing Tmux Plugin Manager..."
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
+
+# Install tmux plugins using TPM
+echo "Installing tmux plugins..."
+if command -v tmux &> /dev/null; then
+    # Start a tmux server (if not already running)
+    tmux start-server
+    
+    # Create a new session without attaching
+    tmux new-session -d -s temp_plugin_install 2>/dev/null || true
+    
+    # Install plugins
+    echo "Running TPM plugin installation..."
+    ~/.tmux/plugins/tpm/bin/install_plugins
+    
+    # Kill the temporary session
+    tmux kill-session -t temp_plugin_install 2>/dev/null || true
+    
+    echo "Tmux plugins installed successfully!"
+else
+    echo "Warning: tmux is not installed. Skipping plugin installation."
+fi
+
+echo "Tmux setup complete!"

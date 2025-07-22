@@ -1,0 +1,27 @@
+# Raycast (contains sensitive tokens)
+.config/raycast/
+
+# System files
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Cache and temporary files
+**/cache/
+**/Cache/
+**/.cache/
+**/tmp/
+**/temp/
+**/*.log
+**/*.pid
+**/*.lock
+
+# Compiled files
+*.pyc
+*.pyo
+__pycache__/
+*.so
+*.dylib
+*.dll
