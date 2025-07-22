@@ -50,6 +50,11 @@ if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autocomplete" ]; then
 fi
 
 # Install fzf-git.sh
+if [ -f "$HOME/fzf-git.sh" ] && [ ! -d "$HOME/fzf-git.sh" ]; then
+    echo "Removing existing fzf-git.sh file..."
+    rm -f "$HOME/fzf-git.sh"
+fi
+
 if [ ! -d "$HOME/fzf-git.sh" ]; then
     echo "Installing fzf-git.sh..."
     git clone https://github.com/junegunn/fzf-git.sh.git ~/fzf-git.sh

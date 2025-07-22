@@ -5,5 +5,5 @@ macos-option-as-alt = true
 keybind = shift+enter=text:\n
 
 
-font-family="JetBrainsMonoNL Nerd Font Mono Regular"
+font-family="JetBrainsMonoNerdFontPropo-Light"
 font-feature=-calt
