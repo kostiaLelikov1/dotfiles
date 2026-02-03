@@ -1,7 +1,6 @@
 tap "github/bootstrap"
 tap "homebrew/bundle"
 tap "mongodb/brew"
-tap "nikitabobko/tap"
 tap "pkgxdev/made"
 
 brew "atuin"
@@ -55,7 +54,6 @@ brew "stylua"
 brew "telnet"
 brew "terraform"
 brew "terragrunt"
-brew "thefuck"
 brew "tmux"
 brew "tmuxinator"
 brew "watchman"
@@ -64,10 +62,8 @@ brew "zoxide"
 brew "mongodb/brew/mongodb-database-tools"
 brew "pkgxdev/made/pkgx"
 
-cask "aerospace"
 cask "orbstack"
 cask "ghostty"
-cask "keepassxc"
 cask "raycast"
 
 mas "Amphetamine", id: 937984704
