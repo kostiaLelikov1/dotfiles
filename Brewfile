@@ -1,5 +1,4 @@
 tap "github/bootstrap"
-tap "homebrew/bundle"
 tap "mongodb/brew"
 tap "pkgxdev/made"
 
